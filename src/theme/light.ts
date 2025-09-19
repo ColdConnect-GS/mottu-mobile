@@ -1,8 +1,8 @@
 export default {
   background: "#ffffff",
   text: "#000000",
-  primary: "#007bff",
+  primary: "#00b131",
   secondary: "#6c757d",
-  success: "#28a745",
+  success: "#00b131",
   danger: "#dc3545",
 };

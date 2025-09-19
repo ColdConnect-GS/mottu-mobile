@@ -1,38 +1,74 @@
-import React from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { useTheme } from "../theme/ThemeContext";
 
-const vagasMock = [
-  { id: "1", vaga: "A1", status: "Ocupada" },
-  { id: "2", vaga: "A2", status: "Livre" },
-  { id: "3", vaga: "B1", status: "Ocupada" },
-];
+const gerarVagas = () => {
+  const vagas: { id: string; status: "Livre" | "Ocupada" }[] = [];
+  const letras = "ABCDEFGH"; // 8 linhas
+for (let i = 0; i < letras.length; i++) { // linhas
+  for (let j = 1; j <= 10; j++) { // 10 colunas
+    vagas.push({
+      id: `${letras[i]}${j}`,
+      status: Math.random() > 0.5 ? "Livre" : "Ocupada",
+    });
+  }
+}
+  return vagas;
+};
 
 export default function VagasScreen() {
   const { theme } = useTheme();
+  const [vagas, setVagas] = useState(gerarVagas());
+
+  const toggleVaga = (id: string) => {
+    const updated = vagas.map((v) =>
+      v.id === id ? { ...v, status: v.status === "Livre" ? "Ocupada" : "Livre" } : v
+    );
+    setVagas(updated);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.title, { color: theme.text }]}>Vagas</Text>
 
       <FlatList
-        data={vagasMock}
+        data={vagas}
         keyExtractor={(item) => item.id}
+        numColumns={10}
+        columnWrapperStyle={styles.row} // espaçamento entre colunas
         renderItem={({ item }) => (
-          <View style={[styles.card, { borderColor: theme.primary }]}>
-            <Text style={{ color: theme.text }}>Vaga: {item.vaga}</Text>
-            <Text style={{ color: item.status === "Livre" ? theme.success : theme.danger }}>
-              {item.status}
-            </Text>
-          </View>
+          <TouchableOpacity
+            style={[
+              styles.vagaBox,
+              {
+                backgroundColor: item.status === "Livre" ? theme.success : theme.danger,
+              },
+            ]}
+            onPress={() => toggleVaga(item.id)}
+          >
+            <Text style={styles.vagaText}>{item.id}</Text>
+          </TouchableOpacity>
         )}
+        scrollEnabled
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-  card: { padding: 15, borderWidth: 1, borderRadius: 5, marginBottom: 10 },
+  container: { flex: 1, padding: 10 },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10, textAlign: "center" },
+  row: { justifyContent: "space-between", marginBottom: 40 },
+  vagaBox: {
+    flexBasis: "9%",
+    aspectRatio: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  vagaText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
 });
