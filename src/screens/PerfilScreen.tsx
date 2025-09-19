@@ -4,8 +4,8 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Image,
+  Alert,
 } from "react-native";
 import { useTheme } from "../theme/ThemeContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -91,19 +91,24 @@ export default function PerfilScreen({ navigation }: Props) {
       </TouchableOpacity>
 
       <View style={styles.infoBox}>
-        <Text style={[styles.infoText, { color: theme.text }]}>
-          Nome: {user.nome}
-        </Text>
-        <Text style={[styles.infoText, { color: theme.text }]}>
-          Email: {user.email}
-        </Text>
-        <Text style={[styles.infoText, { color: theme.text }]}>
-          CPF: {user.cpf || "Não informado"}
-        </Text>
+        <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
+          <Text style={[styles.label, { color: theme.text }]}>Nome:</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{user.nome}</Text>
+        </View>
+
+        <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
+          <Text style={[styles.label, { color: theme.text }]}>Email:</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{user.email}</Text>
+        </View>
+
+        <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
+          <Text style={[styles.label, { color: theme.text }]}>CPF:</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{user.cpf || "Não informado"}</Text>
+        </View>
       </View>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: theme.danger, marginTop: 15 }]}
+        style={[styles.button, { backgroundColor: theme.danger }]}
         onPress={handleLogout}
       >
         <Text style={styles.buttonText}>Sair</Text>
@@ -116,8 +121,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
   avatarContainer: { alignItems: "center", marginBottom: 20 },
   avatar: { width: 120, height: 120, borderRadius: 60 },
-  infoBox: { marginBottom: 30, alignItems: "center" },
-  infoText: { fontSize: 16, marginBottom: 8 },
+  infoBox: { width: "100%", marginBottom: 30 },
+  infoRow: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  label: { fontSize: 14, fontWeight: "bold", marginBottom: 2 },
+  value: { fontSize: 16 },
   button: { padding: 15, borderRadius: 5, alignItems: "center", width: "80%" },
   buttonText: { color: "#fff", fontWeight: "bold" },
 });
