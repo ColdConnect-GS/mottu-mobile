@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
@@ -8,7 +16,7 @@ import { useTheme } from "../theme/ThemeContext";
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export default function LoginScreen({ navigation }: Props) {
-  const { theme } = useTheme();
+  const { theme, toggleTheme, isDarkMode } = useTheme(); // puxando tudo
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
@@ -37,6 +45,11 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
+      {/* Botão de trocar tema no canto superior direito */}
+      <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
+        <Text style={{ fontSize: 22 }}>{isDarkMode ? "☀️" : "🌙"}</Text>
+      </TouchableOpacity>
+
       {/* Logo */}
       <Image
         source={require("../../assets/logo_mottu.png")}
@@ -82,9 +95,21 @@ export default function LoginScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  logo: { width: 120, height: 120, marginBottom: 20 }, // tamanho e espaçamento da logo
+  logo: { width: 120, height: 120, marginBottom: 20 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-  input: { width: "100%", padding: 12, borderWidth: 1, borderRadius: 5, marginBottom: 15 },
+  input: {
+    width: "100%",
+    padding: 12,
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+  },
   button: { width: "100%", padding: 15, borderRadius: 5, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" },
+  themeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
 });

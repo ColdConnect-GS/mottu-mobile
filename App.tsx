@@ -29,17 +29,17 @@ function AppNavigator() {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: false }} // tela de login sem header
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
-          options={{ headerShown: false }} // tela de cadastro sem header
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Main"
           component={TabNavigator}
-          options={{ headerShown: false }} // TabNavigator controla os headers das tabs
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
