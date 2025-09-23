@@ -8,10 +8,10 @@ import {
   Alert,
   Image,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useTheme } from "../theme/ThemeContext";
+import axios from "axios";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Register">;
 
@@ -20,44 +20,44 @@ export default function RegisterScreen({ navigation }: Props) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [cpf, setCpf] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!nome || !email || !senha || !cpf) {
+    if (!nome || !email || !senha) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
 
-    const newUser = { nome, email, senha, cpf };
+    setLoading(true);
 
     try {
-      const usersRaw = await AsyncStorage.getItem("users");
-      const users = usersRaw ? JSON.parse(usersRaw) : [];
+      const response = await axios.post("http://localhost:8080/api/register", {
+        nome,
+        email,
+        senha,
+        tipoUsuario: "CLIENTE", // você pode deixar fixo como CLIENTE
+      });
 
-      if (users.some((u: any) => u.email === email)) {
-        Alert.alert("Erro", "Email já cadastrado!");
-        return;
+      if (response.status === 200 || response.status === 201) {
+        Alert.alert("Sucesso", "Cadastro realizado!");
+        navigation.replace("Login");
       }
-
-      users.push(newUser);
-      await AsyncStorage.setItem("users", JSON.stringify(users));
-      await AsyncStorage.setItem("loggedUser", JSON.stringify(newUser));
-
-      Alert.alert("Sucesso", "Cadastro realizado!");
-      navigation.replace("Main");
-    } catch (error) {
-      console.error("Erro ao salvar usuário:", error);
+    } catch (error: any) {
+      console.error("Erro ao registrar:", error.response || error.message);
+      const msg = error.response?.data?.mensagem || "Erro ao registrar usuário";
+      Alert.alert("Erro", msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Botão de trocar tema no canto superior direito */}
+      {/* Botão de trocar tema */}
       <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
         <Text style={{ fontSize: 22 }}>{isDarkMode ? "☀️" : "🌙"}</Text>
       </TouchableOpacity>
 
-      {/* Logo */}
       <Image
         source={require("../../assets/logo_mottu.png")}
         style={styles.logo}
@@ -92,22 +92,14 @@ export default function RegisterScreen({ navigation }: Props) {
         onChangeText={setSenha}
       />
 
-      <TextInput
-        placeholder="CPF"
-        placeholderTextColor={theme.secondary}
-        style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-        value={cpf}
-        onChangeText={setCpf}
-      />
-
       <TouchableOpacity
         style={[styles.button, { backgroundColor: theme.primary }]}
         onPress={handleRegister}
+        disabled={loading}
       >
-        <Text style={styles.buttonText}>Cadastrar</Text>
+        <Text style={styles.buttonText}>{loading ? "Cadastrando..." : "Cadastrar"}</Text>
       </TouchableOpacity>
 
-      {/* Botão para voltar ao login */}
       <TouchableOpacity style={{ marginTop: 15 }} onPress={() => navigation.goBack()}>
         <Text style={{ color: theme.primary }}>Voltar para Login</Text>
       </TouchableOpacity>

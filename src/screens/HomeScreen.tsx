@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useTheme } from "../theme/ThemeContext";
+import { getMotos } from "../services/api"; // Função para buscar motos do backend
 
 import logoMottu from "../../assets/logo_mottu.png";
 import mottu_sport from "../../assets/Mottu_sport.png";
@@ -23,12 +24,11 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export default function HomeScreen({ navigation }: Props) {
   const { theme } = useTheme();
-  const [motos, setMotos] = useState([
-    { id: "1", nome: "Mottu Sport", placa: "ABC-1234", vaga: "A1", patio: "Pátio A", km: "1200", status: "Livre", foto: mottu_sport },
-    { id: "2", nome: "Mottu-E", placa: "XYZ-5678", vaga: "B3", patio: "Pátio B", km: "850", status: "Ocupada", foto: mottu_e },
-    { id: "3", nome: "Mottu Pop", placa: "LMN-9012", vaga: "C2", patio: "Pátio A", km: "560", status: "Manutenção", foto: mottu_pop },
-  ]);
 
+  // =========================
+  // Estados
+  // =========================
+  const [motos, setMotos] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMoto, setSelectedMoto] = useState("");
   const [placa, setPlaca] = useState("");
@@ -38,6 +38,28 @@ export default function HomeScreen({ navigation }: Props) {
   const [status, setStatus] = useState("Livre");
   const [editId, setEditId] = useState<string | null>(null);
 
+  // =========================
+  // Função para buscar motos do backend
+  // =========================
+  const fetchMotos = async () => {
+    try {
+      const response = await getMotos();
+      setMotos(response.data);
+    } catch (err) {
+      console.log("Erro ao buscar motos:", err);
+    }
+  };
+
+  // =========================
+  // useEffect para rodar fetchMotos quando a tela abrir
+  // =========================
+  useEffect(() => {
+    fetchMotos();
+  }, []);
+
+  // =========================
+  // Funções de input
+  // =========================
   const handlePlacaChange = (text: string) => {
     let clean = text.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
     if (clean.length > 3) clean = clean.slice(0, 3) + "-" + clean.slice(3, 7);
@@ -62,6 +84,9 @@ export default function HomeScreen({ navigation }: Props) {
     setModalVisible(true);
   };
 
+  // =========================
+  // Adicionar ou editar moto
+  // =========================
   const adicionarOuEditarMoto = () => {
     const placaRegex = /^[A-Z]{3}-\d[0-9A-Z]\d{2}$/;
     const vagaRegex = /^[A-Z][0-9]$/;
@@ -123,6 +148,9 @@ export default function HomeScreen({ navigation }: Props) {
     setEditId(null);
   };
 
+  // =========================
+  // JSX
+  // =========================
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Image source={logoMottu} style={styles.logo} resizeMode="contain" />
