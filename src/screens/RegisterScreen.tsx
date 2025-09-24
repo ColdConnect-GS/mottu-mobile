@@ -20,10 +20,11 @@ export default function RegisterScreen({ navigation }: Props) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [role, setRole] = useState<"CLIENTE" | "ADMIN">("CLIENTE");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!nome || !email || !senha) {
+    if (!nome || !email || !senha || !role) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
@@ -31,11 +32,11 @@ export default function RegisterScreen({ navigation }: Props) {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:8080/api/register", {
-        nome,
+      const response = await axios.post("http://10.0.2.2:8080/api/auth/register", {
+        username: nome,
         email,
-        senha,
-        tipoUsuario: "CLIENTE", // você pode deixar fixo como CLIENTE
+        password: senha,
+        role,
       });
 
       if (response.status === 200 || response.status === 201) {
@@ -92,6 +93,21 @@ export default function RegisterScreen({ navigation }: Props) {
         onChangeText={setSenha}
       />
 
+      {/* Seletor de Role */}
+      <Text style={{ color: theme.text, marginBottom: 5 }}>Tipo de usuário:</Text>
+      {["CLIENTE", "ADMIN"].map((r) => (
+        <TouchableOpacity
+          key={r}
+          style={[
+            styles.roleOption,
+            { backgroundColor: role === r ? theme.primary : theme.secondary + "30" },
+          ]}
+          onPress={() => setRole(r as "CLIENTE" | "ADMIN")}
+        >
+          <Text style={{ color: theme.text }}>{r}</Text>
+        </TouchableOpacity>
+      ))}
+
       <TouchableOpacity
         style={[styles.button, { backgroundColor: theme.primary }]}
         onPress={handleRegister}
@@ -118,12 +134,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
   },
+  roleOption: { padding: 10, borderRadius: 5, marginBottom: 10, width: "100%", alignItems: "center" },
   button: { width: "100%", padding: 15, borderRadius: 5, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" },
-  themeButton: {
-    position: "absolute",
-    top: 40,
-    right: 20,
-    zIndex: 10,
-  },
+  themeButton: { position: "absolute", top: 40, right: 20, zIndex: 10 },
 });

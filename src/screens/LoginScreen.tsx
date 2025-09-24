@@ -12,45 +12,67 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useTheme } from "../theme/ThemeContext";
+import axios from "axios";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export default function LoginScreen({ navigation }: Props) {
-  const { theme, toggleTheme, isDarkMode } = useTheme(); // puxando tudo
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const { theme, toggleTheme, isDarkMode } = useTheme();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!username || !password) {
+      Alert.alert("Erro", "Preencha todos os campos!");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const usersRaw = await AsyncStorage.getItem("users");
-      if (!usersRaw) {
-        Alert.alert("Erro", "Nenhum usuário cadastrado!");
+      console.log("Enviando login:", { username, password });
+
+      const response = await axios({
+        method: "POST",
+        url: "http://10.0.2.2:8080/api/auth/login", // ajuste o IP se estiver em dispositivo real
+        headers: { "Content-Type": "application/json" },
+        data: { username, password },
+      });
+
+      console.log("Resposta do backend:", response.data);
+
+      const token = response.data.token || response.data.accessToken;
+      const user = response.data.user || { username };
+
+      if (!token) {
+        Alert.alert("Erro", "Usuário ou senha incorretos!");
+        setLoading(false);
         return;
       }
 
-      const users = JSON.parse(usersRaw);
-      const user = users.find((u: any) => u.email === email && u.senha === senha);
-
-      if (!user) {
-        Alert.alert("Erro", "Email ou senha incorretos!");
-        return;
-      }
-
+      // Salva token e usuário no AsyncStorage
+      await AsyncStorage.setItem("userToken", token);
       await AsyncStorage.setItem("loggedUser", JSON.stringify(user));
+
+      // Navega para a Main/HomeScreen
       navigation.replace("Main");
-    } catch (error) {
-      console.error("Erro no login:", error);
+    } catch (error: any) {
+      console.error("Erro no login:", error.response || error.message);
+      const msg = error.response?.data?.mensagem || "Erro ao fazer login";
+      Alert.alert("Erro", msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Botão de trocar tema no canto superior direito */}
+      {/* Botão de trocar tema */}
       <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
         <Text style={{ fontSize: 22 }}>{isDarkMode ? "☀️" : "🌙"}</Text>
       </TouchableOpacity>
 
-      {/* Logo */}
       <Image
         source={require("../../assets/logo_mottu.png")}
         style={styles.logo}
@@ -60,11 +82,11 @@ export default function LoginScreen({ navigation }: Props) {
       <Text style={[styles.title, { color: theme.text }]}>Login</Text>
 
       <TextInput
-        placeholder="Email"
+        placeholder="Username"
         placeholderTextColor={theme.secondary}
         style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-        value={email}
-        onChangeText={setEmail}
+        value={username}
+        onChangeText={setUsername}
         autoCapitalize="none"
       />
 
@@ -73,15 +95,16 @@ export default function LoginScreen({ navigation }: Props) {
         placeholderTextColor={theme.secondary}
         secureTextEntry
         style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-        value={senha}
-        onChangeText={setSenha}
+        value={password}
+        onChangeText={setPassword}
       />
 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: theme.primary }]}
         onPress={handleLogin}
+        disabled={loading}
       >
-        <Text style={styles.buttonText}>Entrar</Text>
+        <Text style={styles.buttonText}>{loading ? "Entrando..." : "Entrar"}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>
@@ -106,10 +129,5 @@ const styles = StyleSheet.create({
   },
   button: { width: "100%", padding: 15, borderRadius: 5, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" },
-  themeButton: {
-    position: "absolute",
-    top: 40,
-    right: 20,
-    zIndex: 10,
-  },
+  themeButton: { position: "absolute", top: 40, right: 20, zIndex: 10 },
 });
