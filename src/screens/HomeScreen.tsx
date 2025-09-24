@@ -13,7 +13,7 @@ import {
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useTheme } from "../theme/ThemeContext";
-import { getMotos } from "../services/api"; // Função para buscar motos do backend
+import axios from "axios";
 
 import logoMottu from "../../assets/logo_mottu.png";
 import mottu_sport from "../../assets/Mottu_sport.png";
@@ -25,9 +25,6 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 export default function HomeScreen({ navigation }: Props) {
   const { theme } = useTheme();
 
-  // =========================
-  // Estados
-  // =========================
   const [motos, setMotos] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMoto, setSelectedMoto] = useState("");
@@ -38,27 +35,26 @@ export default function HomeScreen({ navigation }: Props) {
   const [status, setStatus] = useState("Livre");
   const [editId, setEditId] = useState<string | null>(null);
 
+  const API_URL = "http://10.0.2.2:8080/api/motos";
+
   // =========================
-  // Função para buscar motos do backend
+  // Buscar motos
   // =========================
   const fetchMotos = async () => {
     try {
-      const response = await getMotos();
-      setMotos(response.data);
+      const res = await axios.get(API_URL);
+      setMotos(res.data);
     } catch (err) {
       console.log("Erro ao buscar motos:", err);
     }
   };
 
-  // =========================
-  // useEffect para rodar fetchMotos quando a tela abrir
-  // =========================
   useEffect(() => {
     fetchMotos();
   }, []);
 
   // =========================
-  // Funções de input
+  // Inputs
   // =========================
   const handlePlacaChange = (text: string) => {
     let clean = text.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
@@ -85,9 +81,9 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   // =========================
-  // Adicionar ou editar moto
+  // Criar ou editar moto
   // =========================
-  const adicionarOuEditarMoto = () => {
+  const adicionarOuEditarMoto = async () => {
     const placaRegex = /^[A-Z]{3}-\d[0-9A-Z]\d{2}$/;
     const vagaRegex = /^[A-Z][0-9]$/;
 
@@ -116,28 +112,20 @@ export default function HomeScreen({ navigation }: Props) {
     else if (selectedMoto === "Mottu-E") foto = mottu_e;
     else if (selectedMoto === "Mottu Pop") foto = mottu_pop;
 
-    if (editId) {
-      // Editar moto existente
-      const motosAtualizadas = motos.map((m) =>
-        m.id === editId ? { ...m, nome: selectedMoto, placa, vaga, patio, km, status, foto } : m
-      );
-      setMotos(motosAtualizadas);
-    } else {
-      // Adicionar nova moto
-      const novaMoto = {
-        id: (motos.length + 1).toString(),
-        nome: selectedMoto,
-        placa,
-        vaga,
-        patio,
-        km,
-        status,
-        foto,
-      };
-      setMotos([...motos, novaMoto]);
+    const motoData = { nome: selectedMoto, placa, vaga, patio, km, status, foto };
+
+    try {
+      if (editId) {
+        await axios.put(`${API_URL}/${editId}`, motoData);
+      } else {
+        await axios.post(API_URL, motoData);
+      }
+      fetchMotos();
+    } catch (err) {
+      console.log("Erro ao salvar moto:", err);
+      Alert.alert("Erro", "Não foi possível salvar a moto.");
     }
 
-    // Resetar modal
     setModalVisible(false);
     setSelectedMoto("");
     setPlaca("");
@@ -163,7 +151,6 @@ export default function HomeScreen({ navigation }: Props) {
         <Text style={styles.buttonText}>Adicionar Moto na Vaga</Text>
       </TouchableOpacity>
 
-      {/* Modal */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -199,7 +186,6 @@ export default function HomeScreen({ navigation }: Props) {
               value={placa}
               onChangeText={handlePlacaChange}
             />
-
             <TextInput
               placeholder="Vaga (A1)"
               placeholderTextColor={theme.secondary}
@@ -207,7 +193,6 @@ export default function HomeScreen({ navigation }: Props) {
               value={vaga}
               onChangeText={handleVagaChange}
             />
-
             <TextInput
               placeholder="Pátio (ex: Pátio A)"
               placeholderTextColor={theme.secondary}
@@ -215,7 +200,6 @@ export default function HomeScreen({ navigation }: Props) {
               value={patio}
               onChangeText={(t) => setPatio(t)}
             />
-
             <TextInput
               placeholder="Quilometragem (KM)"
               placeholderTextColor={theme.secondary}
@@ -260,7 +244,6 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </Modal>
 
-      {/* Listagem */}
       <FlatList
         data={motos}
         keyExtractor={(item) => item.id}
