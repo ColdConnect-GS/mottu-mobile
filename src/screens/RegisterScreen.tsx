@@ -17,14 +17,14 @@ type Props = NativeStackScreenProps<RootStackParamList, "Register">;
 
 export default function RegisterScreen({ navigation }: Props) {
   const { theme, toggleTheme, isDarkMode } = useTheme();
-  const [nome, setNome] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [role, setRole] = useState<"CLIENTE" | "ADMIN">("CLIENTE");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!nome || !email || !senha || !role) {
+    if (!username || !email || !senha || !role) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
@@ -33,7 +33,7 @@ export default function RegisterScreen({ navigation }: Props) {
 
     try {
       const response = await axios.post("http://10.0.2.2:8080/api/auth/register", {
-        username: nome,
+        username: username,
         email,
         password: senha,
         role,
@@ -71,8 +71,8 @@ export default function RegisterScreen({ navigation }: Props) {
         placeholder="Nome"
         placeholderTextColor={theme.secondary}
         style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-        value={nome}
-        onChangeText={setNome}
+        value={username}
+        onChangeText={setUsername}
       />
 
       <TextInput

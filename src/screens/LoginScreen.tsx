@@ -10,20 +10,20 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../App"; // Ajuste o caminho se necessário
-import { useTheme } from "../theme/ThemeContext"; // Ajuste o caminho se necessário
+import { RootStackParamList } from "../../App";
+import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export default function LoginScreen({ navigation }: Props) {
   const { theme, toggleTheme, isDarkMode } = useTheme();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    if (!email || !password) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
@@ -31,57 +31,47 @@ export default function LoginScreen({ navigation }: Props) {
     setLoading(true);
 
     try {
-      console.log("Enviando login:", { username, password });
+      console.log("Enviando login:", { email: email, password });
 
       const response = await axios({
         method: "POST",
-        url: "http://10.0.2.2:8080/api/auth/login", // ajuste o IP se estiver em dispositivo real
+        url: "http://10.0.2.2:8080/api/auth/login",
         headers: { "Content-Type": "application/json" },
-        data: { username, password },
+        data: { email: email, password },
       });
 
       console.log("Resposta do backend:", response.data);
 
-      // --- CORREÇÃO APLICADA AQUI ---
-      // Verificamos se a mensagem de sucesso foi retornada pelo backend.
       const loginSuccess = response.data?.message === "Login realizado com sucesso";
 
       if (loginSuccess) {
-        // O login foi bem-sucedido.
-        const user = { username };
-
-        // Salva um indicador de que o usuário está logado e seus dados.
-        await AsyncStorage.setItem("userToken", "true"); // Usamos "true" como indicador de login
+        const user = { email: email };
+        await AsyncStorage.setItem("userToken", "true");
         await AsyncStorage.setItem("loggedUser", JSON.stringify(user));
 
-        // Navega para a tela principal
         navigation.replace("Main");
 
       } else {
-        // Se o backend respondeu com sucesso (status 200), mas não com a mensagem esperada.
         const errorMessage = response.data?.message || "Usuário ou senha incorretos!";
         Alert.alert("Erro", errorMessage);
       }
     } catch (error: any) {
-      // Este bloco 'catch' é executado para erros de rede ou respostas com status de erro (4xx, 5xx).
       console.error("Erro no login:", error.response?.data || error.message);
       const msg = error.response?.data?.message || "Usuário ou senha incorretos!";
       Alert.alert("Erro", msg);
     } finally {
-      // Garante que o estado de 'loading' seja desativado ao final da operação.
       setLoading(false);
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Botão de trocar tema */}
       <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
         <Text style={{ fontSize: 22 }}>{isDarkMode ? "☀️" : "🌙"}</Text>
       </TouchableOpacity>
 
       <Image
-        source={require("../../assets/logo_mottu.png")} // Ajuste o caminho se necessário
+        source={require("../../assets/logo_mottu.png")}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -89,11 +79,11 @@ export default function LoginScreen({ navigation }: Props) {
       <Text style={[styles.title, { color: theme.text }]}>Login</Text>
 
       <TextInput
-        placeholder="Username"
+        placeholder="Email"
         placeholderTextColor={theme.secondary}
         style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-        value={username}
-        onChangeText={setUsername}
+        value={email}
+        onChangeText={setEmail}
         autoCapitalize="none"
       />
 

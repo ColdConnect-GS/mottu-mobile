@@ -17,10 +17,10 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 type Props = NativeStackScreenProps<RootStackParamList, "Perfil">;
 
 type User = {
-  nome: string;
+  username: string;
   email: string;
-  cpf?: string;
-  senha: string;
+  password?: string;
+  role?: string;
   photo?: string;
 };
 
@@ -30,8 +30,14 @@ export default function PerfilScreen({ navigation }: Props) {
 
   useEffect(() => {
     const loadUser = async () => {
-      const storedUser = await AsyncStorage.getItem("loggedUser");
-      if (storedUser) setUser(JSON.parse(storedUser));
+      try {
+        const storedUser = await AsyncStorage.getItem("loggedUser");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (err) {
+        console.warn("Erro ao carregar usuário:", err);
+      }
     };
     loadUser();
   }, []);
@@ -64,8 +70,9 @@ export default function PerfilScreen({ navigation }: Props) {
       quality: 0.7,
     });
 
-    if (!result.canceled) {
-      const updatedUser = { ...user, photo: result.assets[0].uri } as User;
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
+      const updatedUser = { ...user, photo: uri } as User;
       setUser(updatedUser);
       await AsyncStorage.setItem("loggedUser", JSON.stringify(updatedUser));
     }
@@ -93,17 +100,12 @@ export default function PerfilScreen({ navigation }: Props) {
       <View style={styles.infoBox}>
         <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
           <Text style={[styles.label, { color: theme.text }]}>Nome:</Text>
-          <Text style={[styles.value, { color: theme.text }]}>{user.nome}</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{user.username}</Text>
         </View>
 
         <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
           <Text style={[styles.label, { color: theme.text }]}>Email:</Text>
           <Text style={[styles.value, { color: theme.text }]}>{user.email}</Text>
-        </View>
-
-        <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
-          <Text style={[styles.label, { color: theme.text }]}>CPF:</Text>
-          <Text style={[styles.value, { color: theme.text }]}>{user.cpf || "Não informado"}</Text>
         </View>
       </View>
 
