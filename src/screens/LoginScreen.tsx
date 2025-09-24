@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../App";
-import { useTheme } from "../theme/ThemeContext";
+import { RootStackParamList } from "../../App"; // Ajuste o caminho se necessário
+import { useTheme } from "../theme/ThemeContext"; // Ajuste o caminho se necessário
 import axios from "axios";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
@@ -42,26 +42,33 @@ export default function LoginScreen({ navigation }: Props) {
 
       console.log("Resposta do backend:", response.data);
 
-      const token = response.data.token || response.data.accessToken;
-      const user = response.data.user || { username };
+      // --- CORREÇÃO APLICADA AQUI ---
+      // Verificamos se a mensagem de sucesso foi retornada pelo backend.
+      const loginSuccess = response.data?.message === "Login realizado com sucesso";
 
-      if (!token) {
-        Alert.alert("Erro", "Usuário ou senha incorretos!");
-        setLoading(false);
-        return;
+      if (loginSuccess) {
+        // O login foi bem-sucedido.
+        const user = { username };
+
+        // Salva um indicador de que o usuário está logado e seus dados.
+        await AsyncStorage.setItem("userToken", "true"); // Usamos "true" como indicador de login
+        await AsyncStorage.setItem("loggedUser", JSON.stringify(user));
+
+        // Navega para a tela principal
+        navigation.replace("Main");
+
+      } else {
+        // Se o backend respondeu com sucesso (status 200), mas não com a mensagem esperada.
+        const errorMessage = response.data?.message || "Usuário ou senha incorretos!";
+        Alert.alert("Erro", errorMessage);
       }
-
-      // Salva token e usuário no AsyncStorage
-      await AsyncStorage.setItem("userToken", token);
-      await AsyncStorage.setItem("loggedUser", JSON.stringify(user));
-
-      // Navega para a Main/HomeScreen
-      navigation.replace("Main");
     } catch (error: any) {
-      console.error("Erro no login:", error.response || error.message);
-      const msg = error.response?.data?.mensagem || "Erro ao fazer login";
+      // Este bloco 'catch' é executado para erros de rede ou respostas com status de erro (4xx, 5xx).
+      console.error("Erro no login:", error.response?.data || error.message);
+      const msg = error.response?.data?.message || "Usuário ou senha incorretos!";
       Alert.alert("Erro", msg);
     } finally {
+      // Garante que o estado de 'loading' seja desativado ao final da operação.
       setLoading(false);
     }
   };
@@ -74,7 +81,7 @@ export default function LoginScreen({ navigation }: Props) {
       </TouchableOpacity>
 
       <Image
-        source={require("../../assets/logo_mottu.png")}
+        source={require("../../assets/logo_mottu.png")} // Ajuste o caminho se necessário
         style={styles.logo}
         resizeMode="contain"
       />
