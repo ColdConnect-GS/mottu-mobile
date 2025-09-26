@@ -1,74 +1,143 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { useTheme } from "../theme/ThemeContext";
+import axios from "axios";
 
-const gerarVagas = () => {
-  const vagas: { id: string; status: "Livre" | "Ocupada" }[] = [];
-  const letras = "ABCDEFGH"; // 8 linhas
-for (let i = 0; i < letras.length; i++) { // linhas
-  for (let j = 1; j <= 10; j++) { // 10 colunas
-    vagas.push({
-      id: `${letras[i]}${j}`,
-      status: Math.random() > 0.5 ? "Livre" : "Ocupada",
-    });
-  }
-}
-  return vagas;
+const BASE_URL = "http://10.0.2.2:8080/api";
+
+type Vaga = {
+  id: number;
+  identificador: string;
+  codigo: string;
+  ocupada: boolean | null;
+  patioId: number;
+  patioNome: string;
+  placaMoto: string | null;
+};
+
+type Patio = {
+  id: number;
+  nome: string;
+  endereco: string;
+  capacidade: number;
+  vagasDisponiveis: number;
+  vagas: Vaga[];
 };
 
 export default function VagasScreen() {
   const { theme } = useTheme();
-  const [vagas, setVagas] = useState(gerarVagas());
 
-  const toggleVaga = (id: string) => {
-    const updated = vagas.map((v) =>
-      v.id === id ? { ...v, status: v.status === "Livre" ? "Ocupada" : "Livre" } : v
-    );
-    setVagas(updated);
+  const [patio, setPatio] = useState<Patio | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchPatio = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${BASE_URL}/patios/1`);
+      setPatio(res.data);
+    } catch (err) {
+      console.error("Erro ao buscar pátio:", err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchPatio();
+  }, []);
+
+  if (loading || !patio) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={{ color: theme.text, marginTop: 10 }}>
+          Carregando vagas...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.title, { color: theme.text }]}>Vagas</Text>
+      <Text style={[styles.title, { color: theme.primary }]}>
+        {patio.nome}
+      </Text>
+      <Text style={[styles.subtitle, { color: theme.text }]}>
+        {patio.endereco} • Vagas disponíveis: {patio.vagasDisponiveis}
+      </Text>
 
       <FlatList
-        data={vagas}
-        keyExtractor={(item) => item.id}
-        numColumns={10}
-        columnWrapperStyle={styles.row} // espaçamento entre colunas
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.vagaBox,
-              {
-                backgroundColor: item.status === "Livre" ? theme.success : theme.danger,
-              },
-            ]}
-            onPress={() => toggleVaga(item.id)}
-          >
-            <Text style={styles.vagaText}>{item.id}</Text>
-          </TouchableOpacity>
-        )}
-        scrollEnabled
+        data={patio.vagas}
+        keyExtractor={(item) => String(item.id)}
+        numColumns={5}
+        columnWrapperStyle={styles.row}
+        renderItem={({ item }) => {
+          const backgroundColor =
+            item.ocupada === true
+              ? "#e74c3c" // vermelho
+              : "#2ecc71"; // verde
+
+          return (
+            <TouchableOpacity
+              style={[styles.vagaBox, { backgroundColor }]}
+              disabled
+            >
+              <Text style={styles.vagaText}>{item.identificador}</Text>
+              {item.placaMoto && (
+                <Text style={styles.placaText}>{item.placaMoto}</Text>
+              )}
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10, textAlign: "center" },
-  row: { justifyContent: "space-between", marginBottom: 40 },
+  container: { flex: 1, padding: 16 },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  row: {
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
   vagaBox: {
-    flexBasis: "9%",
+    flexBasis: "18%",
     aspectRatio: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 5,
+    borderRadius: 8,
+    padding: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   vagaText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 14,
+  },
+  placaText: {
+    color: "#fff",
+    fontSize: 10,
+    marginTop: 4,
   },
 });

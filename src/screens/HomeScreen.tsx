@@ -32,7 +32,6 @@ export default function HomeScreen({ navigation }: Props) {
   const [ano, setAno] = useState("");
   const [quilometragem, setQuilometragem] = useState("");
   const [status, setStatus] = useState("DISPONIVEL");
-  const [patioId, setPatioId] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
 
   const API_URL = "http://10.0.2.2:8080/api/motos";
@@ -71,7 +70,6 @@ export default function HomeScreen({ navigation }: Props) {
     setAno(String(moto.ano));
     setQuilometragem(String(moto.quilometragem));
     setStatus(moto.status);
-    setPatioId(String(moto.patioId));
     setEditId(moto.id);
     setModalVisible(true);
   };
@@ -82,7 +80,7 @@ export default function HomeScreen({ navigation }: Props) {
   const adicionarOuEditarMoto = async () => {
     const placaRegex = /^[A-Z]{3}-\d[0-9A-Z]\d{2}$/;
 
-    if (!modelo || !placa || !ano || !quilometragem || !status || !patioId) {
+    if (!modelo || !placa || !ano || !quilometragem || !status) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
@@ -108,8 +106,10 @@ export default function HomeScreen({ navigation }: Props) {
       ano: Number(ano),
       quilometragem: Number(quilometragem),
       status,
-      patioId: Number(patioId),
+      patioId: 1, // valor fixo para evitar erro 400
     };
+
+    console.log("Dados enviados:", motoData);
 
     try {
       if (editId) {
@@ -129,7 +129,6 @@ export default function HomeScreen({ navigation }: Props) {
     setAno("");
     setQuilometragem("");
     setStatus("DISPONIVEL");
-    setPatioId("");
     setEditId(null);
   };
 
@@ -204,14 +203,6 @@ export default function HomeScreen({ navigation }: Props) {
               value={quilometragem}
               onChangeText={setQuilometragem}
             />
-            <TextInput
-              placeholder="Pátio ID"
-              placeholderTextColor={theme.secondary}
-              keyboardType="numeric"
-              style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-              value={patioId}
-              onChangeText={setPatioId}
-            />
 
             <Text style={{ color: theme.text, marginBottom: 5 }}>Status:</Text>
             {["DISPONIVEL", "OCUPADA", "MANUTENCAO"].map((s) => (
@@ -266,7 +257,6 @@ export default function HomeScreen({ navigation }: Props) {
                 Quilometragem: {item.quilometragem}
               </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>Status: {item.status}</Text>
-              <Text style={[styles.motoText, { color: theme.text }]}>Pátio ID: {item.patioId}</Text>
             </View>
           </TouchableOpacity>
         )}
