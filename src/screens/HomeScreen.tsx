@@ -27,12 +27,12 @@ export default function HomeScreen({ navigation }: Props) {
 
   const [motos, setMotos] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedMoto, setSelectedMoto] = useState("");
+  const [modelo, setModelo] = useState("");
   const [placa, setPlaca] = useState("");
-  const [vaga, setVaga] = useState("");
-  const [patio, setPatio] = useState("");
-  const [km, setKm] = useState("");
-  const [status, setStatus] = useState("Livre");
+  const [ano, setAno] = useState("");
+  const [quilometragem, setQuilometragem] = useState("");
+  const [status, setStatus] = useState("DISPONIVEL");
+  const [patioId, setPatioId] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
 
   const API_URL = "http://10.0.2.2:8080/api/motos";
@@ -54,7 +54,7 @@ export default function HomeScreen({ navigation }: Props) {
   }, []);
 
   // =========================
-  // Inputs
+  // Inputs formatados
   // =========================
   const handlePlacaChange = (text: string) => {
     let clean = text.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
@@ -62,20 +62,16 @@ export default function HomeScreen({ navigation }: Props) {
     setPlaca(clean.slice(0, 8));
   };
 
-  const handleVagaChange = (text: string) => {
-    setVaga(text.toUpperCase().slice(0, 2));
-  };
-
   const abrirModalEdicao = (motoId: string) => {
     const moto = motos.find((m) => m.id === motoId);
     if (!moto) return;
 
-    setSelectedMoto(moto.nome);
+    setModelo(moto.modelo);
     setPlaca(moto.placa);
-    setVaga(moto.vaga);
-    setPatio(moto.patio);
-    setKm(moto.km);
+    setAno(String(moto.ano));
+    setQuilometragem(String(moto.quilometragem));
     setStatus(moto.status);
+    setPatioId(String(moto.patioId));
     setEditId(moto.id);
     setModalVisible(true);
   };
@@ -85,9 +81,8 @@ export default function HomeScreen({ navigation }: Props) {
   // =========================
   const adicionarOuEditarMoto = async () => {
     const placaRegex = /^[A-Z]{3}-\d[0-9A-Z]\d{2}$/;
-    const vagaRegex = /^[A-Z][0-9]$/;
 
-    if (!selectedMoto || !placa || !vaga || !patio || !km || !status) {
+    if (!modelo || !placa || !ano || !quilometragem || !status || !patioId) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
@@ -97,22 +92,24 @@ export default function HomeScreen({ navigation }: Props) {
       return;
     }
 
-    if (!vagaRegex.test(vaga)) {
-      Alert.alert("Erro", "A vaga deve ter 2 caracteres, letra + número (ex: A1, B5).");
+    if (isNaN(Number(ano)) || Number(ano) < 2000) {
+      Alert.alert("Erro", "Informe um ano válido.");
       return;
     }
 
-    if (isNaN(Number(km))) {
+    if (isNaN(Number(quilometragem))) {
       Alert.alert("Erro", "A quilometragem deve ser um número válido.");
       return;
     }
 
-    let foto;
-    if (selectedMoto === "Mottu Sport") foto = mottu_sport;
-    else if (selectedMoto === "Mottu-E") foto = mottu_e;
-    else if (selectedMoto === "Mottu Pop") foto = mottu_pop;
-
-    const motoData = { nome: selectedMoto, placa, vaga, patio, km, status, foto };
+    const motoData = {
+      placa,
+      modelo,
+      ano: Number(ano),
+      quilometragem: Number(quilometragem),
+      status,
+      patioId: Number(patioId),
+    };
 
     try {
       if (editId) {
@@ -127,18 +124,25 @@ export default function HomeScreen({ navigation }: Props) {
     }
 
     setModalVisible(false);
-    setSelectedMoto("");
+    setModelo("");
     setPlaca("");
-    setVaga("");
-    setPatio("");
-    setKm("");
-    setStatus("Livre");
+    setAno("");
+    setQuilometragem("");
+    setStatus("DISPONIVEL");
+    setPatioId("");
     setEditId(null);
   };
 
   // =========================
   // JSX
   // =========================
+  const getMotoImage = (modelo: string) => {
+    if (modelo === "MOTTU_SPORT") return mottu_sport;
+    if (modelo === "MOTTU_E") return mottu_e;
+    if (modelo === "MOTTU_POP") return mottu_pop;
+    return mottu_sport;
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Image source={logoMottu} style={styles.logo} resizeMode="contain" />
@@ -151,6 +155,7 @@ export default function HomeScreen({ navigation }: Props) {
         <Text style={styles.buttonText}>Adicionar Moto na Vaga</Text>
       </TouchableOpacity>
 
+      {/* Modal */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -163,19 +168,16 @@ export default function HomeScreen({ navigation }: Props) {
               {editId ? "Editar Moto" : "Adicionar Moto"}
             </Text>
 
-            {["Mottu Sport", "Mottu-E", "Mottu Pop"].map((moto) => (
+            {["MOTTU_SPORT", "MOTTU_E", "MOTTU_POP"].map((m) => (
               <TouchableOpacity
-                key={moto}
+                key={m}
                 style={[
                   styles.motoOption,
-                  {
-                    backgroundColor:
-                      selectedMoto === moto ? theme.primary : theme.secondary + "30",
-                  },
+                  { backgroundColor: modelo === m ? theme.primary : theme.secondary + "30" },
                 ]}
-                onPress={() => setSelectedMoto(moto)}
+                onPress={() => setModelo(m)}
               >
-                <Text style={{ color: theme.text }}>{moto}</Text>
+                <Text style={{ color: theme.text }}>{m}</Text>
               </TouchableOpacity>
             ))}
 
@@ -187,30 +189,32 @@ export default function HomeScreen({ navigation }: Props) {
               onChangeText={handlePlacaChange}
             />
             <TextInput
-              placeholder="Vaga (A1)"
-              placeholderTextColor={theme.secondary}
-              style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-              value={vaga}
-              onChangeText={handleVagaChange}
-            />
-            <TextInput
-              placeholder="Pátio (ex: Pátio A)"
-              placeholderTextColor={theme.secondary}
-              style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-              value={patio}
-              onChangeText={(t) => setPatio(t)}
-            />
-            <TextInput
-              placeholder="Quilometragem (KM)"
+              placeholder="Ano"
               placeholderTextColor={theme.secondary}
               keyboardType="numeric"
               style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
-              value={km}
-              onChangeText={(t) => setKm(t)}
+              value={ano}
+              onChangeText={setAno}
+            />
+            <TextInput
+              placeholder="Quilometragem"
+              placeholderTextColor={theme.secondary}
+              keyboardType="numeric"
+              style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
+              value={quilometragem}
+              onChangeText={setQuilometragem}
+            />
+            <TextInput
+              placeholder="Pátio ID"
+              placeholderTextColor={theme.secondary}
+              keyboardType="numeric"
+              style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
+              value={patioId}
+              onChangeText={setPatioId}
             />
 
             <Text style={{ color: theme.text, marginBottom: 5 }}>Status:</Text>
-            {["Livre", "Ocupada", "Manutenção"].map((s) => (
+            {["DISPONIVEL", "OCUPADA", "MANUTENCAO"].map((s) => (
               <TouchableOpacity
                 key={s}
                 style={[
@@ -244,6 +248,7 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </Modal>
 
+      {/* Lista */}
       <FlatList
         data={motos}
         keyExtractor={(item) => item.id}
@@ -252,14 +257,16 @@ export default function HomeScreen({ navigation }: Props) {
             onPress={() => abrirModalEdicao(item.id)}
             style={[styles.motoCard, { backgroundColor: theme.secondary + "20" }]}
           >
-            <Image source={item.foto} style={styles.motoImage} />
+            <Image source={getMotoImage(item.modelo)} style={styles.motoImage} />
             <View style={styles.motoInfo}>
-              <Text style={[styles.motoText, { color: theme.text }]}>Nome: {item.nome}</Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>Modelo: {item.modelo}</Text>
               <Text style={[styles.motoText, { color: theme.text }]}>Placa: {item.placa}</Text>
-              <Text style={[styles.motoText, { color: theme.text }]}>Vaga: {item.vaga}</Text>
-              <Text style={[styles.motoText, { color: theme.text }]}>Pátio: {item.patio}</Text>
-              <Text style={[styles.motoText, { color: theme.text }]}>KM: {item.km}</Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>Ano: {item.ano}</Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>
+                Quilometragem: {item.quilometragem}
+              </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>Status: {item.status}</Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>Pátio ID: {item.patioId}</Text>
             </View>
           </TouchableOpacity>
         )}

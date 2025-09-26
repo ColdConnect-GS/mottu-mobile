@@ -6,7 +6,6 @@ export default function ThemeEmojiSwitch() {
   const { isDark, toggleTheme } = useTheme();
   const animatedValue = new Animated.Value(isDark ? 1 : 0);
 
-  // animação do emoji deslizando
   Animated.timing(animatedValue, {
     toValue: isDark ? 1 : 0,
     duration: 200,

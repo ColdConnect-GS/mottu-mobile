@@ -13,34 +13,37 @@ import { RootStackParamList } from "../../App";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useIsFocused } from "@react-navigation/native";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Perfil">;
 
 type User = {
   username: string;
-  email: string;
-  password?: string;
-  role?: string;
+  email?: string;
   photo?: string;
 };
 
 export default function PerfilScreen({ navigation }: Props) {
   const { theme } = useTheme();
+  const isFocused = useIsFocused();
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem("loggedUser");
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (err) {
-        console.warn("Erro ao carregar usuário:", err);
+  const loadUser = async () => {
+    try {
+      const stored = await AsyncStorage.getItem("loggedUser");
+      if (stored) {
+        const parsed: User = JSON.parse(stored);
+        setUser(parsed);
       }
-    };
-    loadUser();
-  }, []);
+    } catch (err) {
+      console.warn("Erro ao carregar usuário:", err);
+      setUser(null);
+    }
+  };
+
+  useEffect(() => {
+    if (isFocused) loadUser();
+  }, [isFocused]);
 
   const handleLogout = async () => {
     Alert.alert("Logout", "Você realmente deseja sair?", [
@@ -72,9 +75,15 @@ export default function PerfilScreen({ navigation }: Props) {
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const uri = result.assets[0].uri;
-      const updatedUser = { ...user, photo: uri } as User;
-      setUser(updatedUser);
-      await AsyncStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+      try {
+        if (user) {
+          const updatedUser = { ...user, photo: uri };
+          await AsyncStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+        }
+      } catch (e) {
+        console.warn("Erro ao salvar foto no AsyncStorage:", e);
+      }
     }
   };
 
@@ -103,10 +112,12 @@ export default function PerfilScreen({ navigation }: Props) {
           <Text style={[styles.value, { color: theme.text }]}>{user.username}</Text>
         </View>
 
-        <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
-          <Text style={[styles.label, { color: theme.text }]}>Email:</Text>
-          <Text style={[styles.value, { color: theme.text }]}>{user.email}</Text>
-        </View>
+        {user.email && (
+          <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
+            <Text style={[styles.label, { color: theme.text }]}>Email:</Text>
+            <Text style={[styles.value, { color: theme.text }]}>{user.email}</Text>
+          </View>
+        )}
       </View>
 
       <TouchableOpacity

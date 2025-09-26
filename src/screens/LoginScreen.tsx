@@ -33,11 +33,9 @@ export default function LoginScreen({ navigation }: Props) {
     try {
       console.log("Enviando login:", { email: email, password });
 
-      const response = await axios({
-        method: "POST",
-        url: "http://10.0.2.2:8080/api/auth/login",
-        headers: { "Content-Type": "application/json" },
-        data: { email: email, password },
+      const response = await axios.post("http://10.0.2.2:8080/api/auth/login", {
+        email,
+        password,
       });
 
       console.log("Resposta do backend:", response.data);
@@ -45,12 +43,17 @@ export default function LoginScreen({ navigation }: Props) {
       const loginSuccess = response.data?.message === "Login realizado com sucesso";
 
       if (loginSuccess) {
-        const user = { email: email };
+        // agora pegamos o username da resposta
+        const user = {
+          username: response.data.username, // <-- vem do backend
+          email: email, // salvamos também o email usado no login
+        };
+
+        // salva no AsyncStorage
         await AsyncStorage.setItem("userToken", "true");
         await AsyncStorage.setItem("loggedUser", JSON.stringify(user));
 
         navigation.replace("Main");
-
       } else {
         const errorMessage = response.data?.message || "Usuário ou senha incorretos!";
         Alert.alert("Erro", errorMessage);
