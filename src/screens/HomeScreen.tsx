@@ -91,6 +91,26 @@ export default function HomeScreen({ navigation }: Props) {
       return;
     }
 
+    // Se for ALUGADA, deletar a moto
+    if (status === "ALUGADA" && editId) {
+      try {
+        await axios.delete(`${API_URL}/${editId}`);
+        fetchMotos();
+      } catch (err) {
+        console.log("Erro ao deletar moto:", err);
+        Alert.alert("Erro", "Não foi possível deletar a moto.");
+      }
+
+      setModalVisible(false);
+      setModelo("");
+      setPlaca("");
+      setAno("");
+      setQuilometragem("");
+      setStatus("DISPONIVEL");
+      setEditId(null);
+      return;
+    }
+
     const motoData = {
       placa,
       modelo,
@@ -192,7 +212,7 @@ export default function HomeScreen({ navigation }: Props) {
             />
 
             <Text style={{ color: theme.text, marginBottom: 5 }}>Status:</Text>
-            {["DISPONIVEL", "OCUPADA", "MANUTENCAO"].map((s) => (
+            {["DISPONIVEL", "ALUGADA", "MANUTENCAO"].map((s) => (
               <TouchableOpacity
                 key={s}
                 style={[
@@ -228,7 +248,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <FlatList
         data={motos}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => abrirModalEdicao(item.id)}
