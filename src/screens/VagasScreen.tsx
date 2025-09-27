@@ -50,12 +50,30 @@ export default function VagasScreen() {
     }
   };
 
-  // <-- Usa useFocusEffect para atualizar sempre que a tela ganhar foco
   useFocusEffect(
     useCallback(() => {
       fetchPatio();
     }, [])
   );
+
+  const renderVaga = ({ item }: { item: Vaga }) => {
+    const backgroundColor =
+      item.ocupada === true
+        ? "#e74c3c" // vermelho
+        : "#2ecc71"; // verde
+
+    return (
+      <TouchableOpacity
+        style={[styles.vagaBox, { backgroundColor }]}
+        disabled
+      >
+        <Text style={styles.vagaText}>{item.identificador}</Text>
+        {item.placaMoto && (
+          <Text style={styles.placaText}>{item.placaMoto}</Text>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   if (loading || !patio) {
     return (
@@ -82,24 +100,7 @@ export default function VagasScreen() {
         keyExtractor={(item) => String(item.id)}
         numColumns={5}
         columnWrapperStyle={styles.row}
-        renderItem={({ item }) => {
-          const backgroundColor =
-            item.ocupada === true
-              ? "#e74c3c" // vermelho
-              : "#2ecc71"; // verde
-
-          return (
-            <TouchableOpacity
-              style={[styles.vagaBox, { backgroundColor }]}
-              disabled
-            >
-              <Text style={styles.vagaText}>{item.identificador}</Text>
-              {item.placaMoto && (
-                <Text style={styles.placaText}>{item.placaMoto}</Text>
-              )}
-            </TouchableOpacity>
-          );
-        }}
+        renderItem={renderVaga}
       />
     </View>
   );

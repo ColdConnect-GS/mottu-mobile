@@ -14,6 +14,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 import logoMottu from "../../assets/logo_mottu.png";
 import mottu_sport from "../../assets/Mottu_sport.png";
@@ -24,6 +25,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export default function HomeScreen({ navigation }: Props) {
   const { theme } = useTheme();
+  const nav = useNavigation();
 
   const [motos, setMotos] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -91,26 +93,6 @@ export default function HomeScreen({ navigation }: Props) {
       return;
     }
 
-    // Se for ALUGADA, deletar a moto
-    if (status === "ALUGADA" && editId) {
-      try {
-        await axios.delete(`${API_URL}/${editId}`);
-        fetchMotos();
-      } catch (err) {
-        console.log("Erro ao deletar moto:", err);
-        Alert.alert("Erro", "Não foi possível deletar a moto.");
-      }
-
-      setModalVisible(false);
-      setModelo("");
-      setPlaca("");
-      setAno("");
-      setQuilometragem("");
-      setStatus("DISPONIVEL");
-      setEditId(null);
-      return;
-    }
-
     const motoData = {
       placa,
       modelo,
@@ -123,11 +105,21 @@ export default function HomeScreen({ navigation }: Props) {
     console.log("Dados enviados:", motoData);
 
     try {
+      if (status === "ALUGADA" && editId) {
+        await axios.delete(`${API_URL}/${editId}`);
+        fetchMotos();
+        nav.navigate("Vagas" as never); // Atualiza vagas
+        setModalVisible(false);
+        resetForm();
+        return;
+      }
+
       if (editId) {
         await axios.put(`${API_URL}/${editId}`, motoData);
       } else {
         await axios.post(API_URL, motoData);
       }
+
       fetchMotos();
     } catch (err) {
       console.log("Erro ao salvar moto:", err);
@@ -135,6 +127,10 @@ export default function HomeScreen({ navigation }: Props) {
     }
 
     setModalVisible(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
     setModelo("");
     setPlaca("");
     setAno("");
@@ -153,7 +149,9 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Image source={logoMottu} style={styles.logo} resizeMode="contain" />
-      <Text style={[styles.title, { color: theme.text }]}>Bem-vindo ao Pátio da Mottu</Text>
+      <Text style={[styles.title, { color: theme.text }]}>
+        Bem-vindo ao Pátio da Mottu
+      </Text>
 
       <TouchableOpacity
         style={[styles.addButton, { backgroundColor: theme.primary }]}
@@ -236,7 +234,7 @@ export default function HomeScreen({ navigation }: Props) {
                 style={[styles.modalButton, { backgroundColor: theme.danger }]}
                 onPress={() => {
                   setModalVisible(false);
-                  setEditId(null);
+                  resetForm();
                 }}
               >
                 <Text style={styles.buttonText}>Cancelar</Text>
@@ -248,7 +246,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <FlatList
         data={motos}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => abrirModalEdicao(item.id)}
@@ -256,13 +254,21 @@ export default function HomeScreen({ navigation }: Props) {
           >
             <Image source={getMotoImage(item.modelo)} style={styles.motoImage} />
             <View style={styles.motoInfo}>
-              <Text style={[styles.motoText, { color: theme.text }]}>Modelo: {item.modelo}</Text>
-              <Text style={[styles.motoText, { color: theme.text }]}>Placa: {item.placa}</Text>
-              <Text style={[styles.motoText, { color: theme.text }]}>Ano: {item.ano}</Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>
+                Modelo: {item.modelo}
+              </Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>
+                Placa: {item.placa}
+              </Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>
+                Ano: {item.ano}
+              </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>
                 Quilometragem: {item.quilometragem}
               </Text>
-              <Text style={[styles.motoText, { color: theme.text }]}>Status: {item.status}</Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>
+                Status: {item.status}
+              </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>
                 Vaga: {item.vagaCodigo || "Não atribuída"}
               </Text>
