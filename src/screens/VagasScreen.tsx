@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
 
 const BASE_URL = "http://10.0.2.2:8080/api";
 
@@ -49,9 +50,12 @@ export default function VagasScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchPatio();
-  }, []);
+  // <-- Usa useFocusEffect para atualizar sempre que a tela ganhar foco
+  useFocusEffect(
+    useCallback(() => {
+      fetchPatio();
+    }, [])
+  );
 
   if (loading || !patio) {
     return (

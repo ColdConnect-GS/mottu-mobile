@@ -36,9 +36,6 @@ export default function HomeScreen({ navigation }: Props) {
 
   const API_URL = "http://10.0.2.2:8080/api/motos";
 
-  // =========================
-  // Buscar motos
-  // =========================
   const fetchMotos = async () => {
     try {
       const res = await axios.get(API_URL);
@@ -52,9 +49,6 @@ export default function HomeScreen({ navigation }: Props) {
     fetchMotos();
   }, []);
 
-  // =========================
-  // Inputs formatados
-  // =========================
   const handlePlacaChange = (text: string) => {
     let clean = text.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
     if (clean.length > 3) clean = clean.slice(0, 3) + "-" + clean.slice(3, 7);
@@ -74,9 +68,6 @@ export default function HomeScreen({ navigation }: Props) {
     setModalVisible(true);
   };
 
-  // =========================
-  // Criar ou editar moto
-  // =========================
   const adicionarOuEditarMoto = async () => {
     const placaRegex = /^[A-Z]{3}-\d[0-9A-Z]\d{2}$/;
 
@@ -106,7 +97,7 @@ export default function HomeScreen({ navigation }: Props) {
       ano: Number(ano),
       quilometragem: Number(quilometragem),
       status,
-      patioId: 1, // valor fixo para evitar erro 400
+      patioId: 1,
     };
 
     console.log("Dados enviados:", motoData);
@@ -132,9 +123,6 @@ export default function HomeScreen({ navigation }: Props) {
     setEditId(null);
   };
 
-  // =========================
-  // JSX
-  // =========================
   const getMotoImage = (modelo: string) => {
     if (modelo === "MOTTU_SPORT") return mottu_sport;
     if (modelo === "MOTTU_E") return mottu_e;
@@ -154,7 +142,6 @@ export default function HomeScreen({ navigation }: Props) {
         <Text style={styles.buttonText}>Adicionar Moto na Vaga</Text>
       </TouchableOpacity>
 
-      {/* Modal */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -239,7 +226,6 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </Modal>
 
-      {/* Lista */}
       <FlatList
         data={motos}
         keyExtractor={(item) => item.id}
@@ -257,6 +243,9 @@ export default function HomeScreen({ navigation }: Props) {
                 Quilometragem: {item.quilometragem}
               </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>Status: {item.status}</Text>
+              <Text style={[styles.motoText, { color: theme.text }]}>
+                Vaga: {item.vagaCodigo || "Não atribuída"}
+              </Text>
             </View>
           </TouchableOpacity>
         )}
