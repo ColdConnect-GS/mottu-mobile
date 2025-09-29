@@ -11,13 +11,13 @@ import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
 
-const BASE_URL = "http://10.0.2.2:8080/api";
+const BASE_URL = "http://172.20.21.191:8080/api";
 
 type Vaga = {
   id: number;
   identificador: string;
   codigo: string;
-  ocupada: boolean | null;
+  ocupada: boolean;
   patioId: number;
   patioNome: string;
   placaMoto: string | null;
@@ -57,16 +57,10 @@ export default function VagasScreen() {
   );
 
   const renderVaga = ({ item }: { item: Vaga }) => {
-    const backgroundColor =
-      item.ocupada === true
-        ? "#e74c3c" // vermelho
-        : "#2ecc71"; // verde
+    const backgroundColor = item.placaMoto ? "#e74c3c" : "#2ecc71";
 
     return (
-      <TouchableOpacity
-        style={[styles.vagaBox, { backgroundColor }]}
-        disabled
-      >
+      <TouchableOpacity style={[styles.vagaBox, { backgroundColor }]} disabled>
         <Text style={styles.vagaText}>{item.identificador}</Text>
         {item.placaMoto && (
           <Text style={styles.placaText}>{item.placaMoto}</Text>
@@ -88,9 +82,7 @@ export default function VagasScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.title, { color: theme.primary }]}>
-        {patio.nome}
-      </Text>
+      <Text style={[styles.title, { color: theme.primary }]}>{patio.nome}</Text>
       <Text style={[styles.subtitle, { color: theme.text }]}>
         {patio.endereco} • Vagas disponíveis: {patio.vagasDisponiveis}
       </Text>

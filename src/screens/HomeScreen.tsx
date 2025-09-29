@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }: Props) {
   const [status, setStatus] = useState("DISPONIVEL");
   const [editId, setEditId] = useState<string | null>(null);
 
-  const API_URL = "http://10.0.2.2:8080/api/motos";
+  const API_URL = "http://172.20.21.191:8080/api/motos";
 
   const fetchMotos = async () => {
     try {
@@ -83,7 +83,7 @@ export default function HomeScreen({ navigation }: Props) {
       return;
     }
 
-    if (isNaN(Number(ano)) || Number(ano) < 2000) {
+    if (isNaN(Number(ano)) || Number(ano) < 1950) {
       Alert.alert("Erro", "Informe um ano válido.");
       return;
     }
@@ -108,7 +108,7 @@ export default function HomeScreen({ navigation }: Props) {
       if (status === "ALUGADA" && editId) {
         await axios.delete(`${API_URL}/${editId}`);
         fetchMotos();
-        nav.navigate("Vagas" as never); // Atualiza vagas
+        nav.navigate("Vagas" as never);
         setModalVisible(false);
         resetForm();
         return;
