@@ -43,13 +43,11 @@ export default function LoginScreen({ navigation }: Props) {
       const loginSuccess = response.data?.message === "Login realizado com sucesso";
 
       if (loginSuccess) {
-        // agora pegamos o username da resposta
         const user = {
-          username: response.data.username, // <-- vem do backend
-          email: email, // salvamos também o email usado no login
+          username: response.data.username,
+          email: email,
         };
 
-        // salva no AsyncStorage
         await AsyncStorage.setItem("userToken", "true");
         await AsyncStorage.setItem("loggedUser", JSON.stringify(user));
 
