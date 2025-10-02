@@ -48,7 +48,7 @@ mottu-mobile/
 1. Clone o repositório:
 
 \`\`\`bash
-git clone https://github.com/LuannZeiro/mottu-mobile.git
+git clone https://github.com/ColdConnect-GS/mottu-mobile.git
 cd mottu-mobile
 \`\`\`
 
