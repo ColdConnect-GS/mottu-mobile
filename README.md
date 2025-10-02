@@ -85,6 +85,6 @@ O app permite cadastrar motos em vagas específicas do pátio seguindo esta lóg
 
 ## Integrantes
 
-- Caio Nyimi - RM556331
-- Henzo Puchetti - RM555179
-- Luann Mariano - RM558548
+- Caio Nyimi - RM556331 - https://github.com/CaioCrNyimi
+- Henzo Puchetti - RM555179 - https://github.com/HenzoPuchetti
+- Luann Mariano - RM558548 - https://github.com/LuannZeiro
