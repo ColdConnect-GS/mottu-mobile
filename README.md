@@ -83,6 +83,8 @@ O app permite cadastrar motos em vagas específicas do pátio seguindo esta lóg
 
 ---
 
-## 📄 Licença
+## Integrantes
 
-Este projeto está licenciado sob a [MIT License](LICENSE).
+Caio Nyimi - RM556331
+Henzo Puchetti - RM555179
+Luann Mariano - RM558548
