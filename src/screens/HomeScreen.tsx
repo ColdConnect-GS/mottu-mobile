@@ -223,7 +223,7 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={{ color: theme.text, marginBottom: 5 }}>
               {i18n.t("status")}:
             </Text>
-            {["DISPONIVEL", "ALUGADA", "MANUTENCAO"].map((s) => (
+            {["DISPONIVEL", "ALUGADA"].map((s) => (
               <TouchableOpacity
                 key={s}
                 style={[
