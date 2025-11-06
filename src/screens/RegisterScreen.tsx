@@ -20,11 +20,10 @@ export default function RegisterScreen({ navigation }: Props) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [role, setRole] = useState<"CLIENTE" | "ADMIN">("CLIENTE");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!username || !email || !senha || !role) {
+    if (!username || !email || !senha) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
@@ -32,11 +31,11 @@ export default function RegisterScreen({ navigation }: Props) {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://172.20.10.13:8080/api/auth/register", {
+      const response = await axios.post("http://172.20.21.191:8080/api/auth/register", {
         username: username,
         email,
         password: senha,
-        role,
+        role: "ADMIN", // Envia sempre ADMIN
       });
 
       if (response.status === 200 || response.status === 201) {
@@ -93,21 +92,6 @@ export default function RegisterScreen({ navigation }: Props) {
         onChangeText={setSenha}
       />
 
-      {/* Seletor de Role */}
-      <Text style={{ color: theme.text, marginBottom: 5 }}>Tipo de usuário:</Text>
-      {["CLIENTE", "ADMIN"].map((r) => (
-        <TouchableOpacity
-          key={r}
-          style={[
-            styles.roleOption,
-            { backgroundColor: role === r ? theme.primary : theme.secondary + "30" },
-          ]}
-          onPress={() => setRole(r as "CLIENTE" | "ADMIN")}
-        >
-          <Text style={{ color: theme.text }}>{r}</Text>
-        </TouchableOpacity>
-      ))}
-
       <TouchableOpacity
         style={[styles.button, { backgroundColor: theme.primary }]}
         onPress={handleRegister}
@@ -134,7 +118,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
   },
-  roleOption: { padding: 10, borderRadius: 5, marginBottom: 10, width: "100%", alignItems: "center" },
   button: { width: "100%", padding: 15, borderRadius: 5, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" },
   themeButton: { position: "absolute", top: 40, right: 20, zIndex: 10 },

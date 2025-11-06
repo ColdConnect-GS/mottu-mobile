@@ -26,11 +26,12 @@ const i18n = new I18n({
     confirm: "Confirmar",
     save: "Salvar",
     cancelButton: "Cancelar",
-    errorFillAll: "Preencha todos os campos!",
-    errorPlateFormat: "A placa deve seguir o formato ABC-1234 ou ABC-1D23.",
-    errorYear: "Informe um ano válido.",
+    error: "Erro!",
+    fillAllFields: "Preencha todos os campos!",
+    plateFormatError: "A placa deve seguir o formato ABC-1234 ou ABC-1D23.",
+    yearError: "Informe um ano válido.",
     errorKm: "A quilometragem deve ser um número válido.",
-    errorSave: "Não foi possível salvar a moto.",
+    saveError: "Não foi possível salvar a moto.",
     model: "Modelo",
     plate: "Placa",
     year: "Ano",
@@ -41,6 +42,11 @@ const i18n = new I18n({
     DISPONIVEL: "DISPONIVEL",
     ALUGADA: "ALUGADA",
     MANUTENCAO: "MANUTENÇÃO",
+
+
+    // ---- VagasScreen ----
+    loadingSpots: "Carregando vagas...",
+    availableSpots: "Vagas disponíveis",
   },
   es: {
     // ---- Perfil ----
@@ -66,11 +72,12 @@ const i18n = new I18n({
     confirm: "Confirmar",
     save: "Guardar",
     cancelButton: "Cancelar",
-    errorFillAll: "¡Complete todos los campos!",
-    errorPlateFormat: "La placa debe seguir el formato ABC-1234 o ABC-1D23.",
-    errorYear: "Ingrese un año válido.",
+    error: "Error",
+    fillAllFields: "¡Complete todos los campos!",
+    plateFormatError: "La placa debe seguir el formato ABC-1234 o ABC-1D23.",
+    yearError: "Ingrese un año válido.",
     errorKm: "El kilometraje debe ser un número válido.",
-    errorSave: "No fue posible guardar la moto.",
+    saveError: "No fue posible guardar la moto.",
     model: "Modelo",
     plate: "Placa",
     year: "Año",
@@ -81,6 +88,13 @@ const i18n = new I18n({
     DISPONIVEL: "DISPONIBLE",
     ALUGADA: "ALQUILADO",
     MANUTENCAO: "MANTENIMIENTO",
+
+
+    // ---- VagasScreen ----
+    loadingSpots: "Cargando espacios...",
+    availableSpots: "Espacios disponibles",
+
+
   },
 });
 

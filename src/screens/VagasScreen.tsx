@@ -10,8 +10,9 @@ import {
 import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
+import i18n from "../i18n/i18n"; // ✅ Import do i18n
 
-const BASE_URL = "http://172.20.10.13:8080/api";
+const BASE_URL = "http://172.20.21.191:8080/api";
 
 type Vaga = {
   id: number;
@@ -34,7 +35,6 @@ type Patio = {
 
 export default function VagasScreen() {
   const { theme } = useTheme();
-
   const [patio, setPatio] = useState<Patio | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -74,7 +74,7 @@ export default function VagasScreen() {
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color={theme.primary} />
         <Text style={{ color: theme.text, marginTop: 10 }}>
-          Carregando vagas...
+          {i18n.t("loadingSpots")}
         </Text>
       </View>
     );
@@ -84,7 +84,7 @@ export default function VagasScreen() {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.title, { color: theme.primary }]}>{patio.nome}</Text>
       <Text style={[styles.subtitle, { color: theme.text }]}>
-        {patio.endereco} • Vagas disponíveis: {patio.vagasDisponiveis}
+        {patio.endereco} • {i18n.t("availableSpots")}: {patio.vagasDisponiveis}
       </Text>
 
       <FlatList

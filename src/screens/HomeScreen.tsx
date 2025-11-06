@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import i18n from "../i18n/i18n";
 
 import logoMottu from "../../assets/logo_mottu.png";
@@ -36,8 +36,9 @@ export default function HomeScreen({ navigation }: Props) {
   const [quilometragem, setQuilometragem] = useState("");
   const [status, setStatus] = useState("DISPONIVEL");
   const [editId, setEditId] = useState<string | null>(null);
+  const [language, setLanguage] = useState(i18n.locale); // 👈 idioma atual
 
-  const API_URL = "http://172.20.10.13:8080/api/motos";
+  const API_URL = "http://172.20.21.191:8080/api/motos";
 
   const fetchMotos = async () => {
     try {
@@ -48,9 +49,22 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
+  // Atualiza motos ao focar na tela
+  useFocusEffect(
+    useCallback(() => {
+      fetchMotos();
+    }, [])
+  );
+
+  // Atualiza idioma automaticamente
   useEffect(() => {
-    fetchMotos();
-  }, []);
+    const interval = setInterval(() => {
+      if (i18n.locale !== language) {
+        setLanguage(i18n.locale);
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, [language]);
 
   const handlePlacaChange = (text: string) => {
     let clean = text.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
@@ -148,9 +162,7 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Image source={logoMottu} style={styles.logo} resizeMode="contain" />
-      <Text style={[styles.title, { color: theme.text }]}>
-        {i18n.t("welcome")}
-      </Text>
+      <Text style={[styles.title, { color: theme.text }]}>{i18n.t("welcome")}</Text>
 
       <TouchableOpacity
         style={[styles.addButton, { backgroundColor: theme.primary }]}
