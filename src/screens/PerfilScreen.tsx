@@ -14,6 +14,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useIsFocused } from "@react-navigation/native";
+import i18n from "../i18n/i18n";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Perfil">;
 
@@ -27,6 +29,7 @@ export default function PerfilScreen({ navigation }: Props) {
   const { theme } = useTheme();
   const isFocused = useIsFocused();
   const [user, setUser] = useState<User | null>(null);
+  const { language, setLanguage, t } = useLanguage();
 
   const loadUser = async () => {
     try {
@@ -46,17 +49,21 @@ export default function PerfilScreen({ navigation }: Props) {
   }, [isFocused]);
 
   const handleLogout = async () => {
-    Alert.alert("Logout", "Você realmente deseja sair?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Sair",
-        style: "destructive",
-        onPress: async () => {
-          await AsyncStorage.removeItem("loggedUser");
-          navigation.replace("Login");
+    Alert.alert(
+      i18n.t("logout"),
+      i18n.t("logoutConfirm"),
+      [
+        { text: i18n.t("cancel"), style: "cancel" },
+        {
+          text: i18n.t("logout"),
+          style: "destructive",
+          onPress: async () => {
+            await AsyncStorage.removeItem("loggedUser");
+            navigation.replace("Login");
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   const pickImage = async () => {
@@ -87,10 +94,16 @@ export default function PerfilScreen({ navigation }: Props) {
     }
   };
 
+  const toggleLanguage = () => {
+    const newLang = language === "pt" ? "es" : "pt";
+    i18n.locale = newLang;
+    setLanguage(newLang);
+  };
+
   if (!user) {
     return (
       <View style={[styles.container, { backgroundColor: theme.background }]}>
-        <Text style={{ color: theme.text }}>Carregando perfil...</Text>
+        <Text style={{ color: theme.text }}>{i18n.t("loading")}</Text>
       </View>
     );
   }
@@ -103,28 +116,37 @@ export default function PerfilScreen({ navigation }: Props) {
         ) : (
           <FontAwesome name="user-circle" size={100} color={theme.primary} />
         )}
-        <Text style={{ color: theme.primary, marginTop: 5 }}>Alterar foto</Text>
+        <Text style={{ color: theme.primary, marginTop: 5 }}>
+          {i18n.t("changePhoto")}
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.infoBox}>
         <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
-          <Text style={[styles.label, { color: theme.text }]}>Nome:</Text>
+          <Text style={[styles.label, { color: theme.text }]}>{i18n.t("name")}:</Text>
           <Text style={[styles.value, { color: theme.text }]}>{user.username}</Text>
         </View>
 
         {user.email && (
           <View style={[styles.infoRow, { backgroundColor: theme.primary + "10" }]}>
-            <Text style={[styles.label, { color: theme.text }]}>Email:</Text>
+            <Text style={[styles.label, { color: theme.text }]}>{i18n.t("email")}:</Text>
             <Text style={[styles.value, { color: theme.text }]}>{user.email}</Text>
           </View>
         )}
       </View>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: theme.danger }]}
+        style={[styles.button, { backgroundColor: theme.primary }]}
+        onPress={toggleLanguage}
+      >
+        <Text style={styles.buttonText}>{i18n.t("changeLanguage")}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: theme.danger, marginTop: 10 }]}
         onPress={handleLogout}
       >
-        <Text style={styles.buttonText}>Sair</Text>
+        <Text style={styles.buttonText}>{i18n.t("logout")}</Text>
       </TouchableOpacity>
     </View>
   );

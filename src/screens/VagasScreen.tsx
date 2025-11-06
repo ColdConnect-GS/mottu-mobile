@@ -11,7 +11,7 @@ import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
 
-const BASE_URL = "http://172.20.21.191:8080/api";
+const BASE_URL = "http://172.20.10.13:8080/api";
 
 type Vaga = {
   id: number;

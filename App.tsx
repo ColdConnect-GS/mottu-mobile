@@ -1,7 +1,12 @@
 import React from "react";
-import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
+import { LanguageProvider } from "./src/i18n/LanguageContext";
 
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
@@ -10,7 +15,7 @@ import TabNavigator from "./src/navigation/TabNavigator";
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  Main: undefined; // TabNavigator
+  Main: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -23,24 +28,12 @@ function AppNavigator() {
       <Stack.Navigator
         initialRouteName="Login"
         screenOptions={{
-          headerShown: true,
+          headerShown: false,
         }}
       >
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Main"
-          component={TabNavigator}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Main" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -48,8 +41,10 @@ function AppNavigator() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AppNavigator />
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <AppNavigator />
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }

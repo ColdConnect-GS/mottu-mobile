@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }: Props) {
   const [status, setStatus] = useState("DISPONIVEL");
   const [editId, setEditId] = useState<string | null>(null);
 
-  const API_URL = "http://172.20.21.191:8080/api/motos";
+  const API_URL = "http://172.20.10.13:8080/api/motos";
 
   const fetchMotos = async () => {
     try {

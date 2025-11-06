@@ -32,7 +32,7 @@ export default function RegisterScreen({ navigation }: Props) {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://172.20.21.191:8080/api/auth/register", {
+      const response = await axios.post("http://172.20.10.13:8080/api/auth/register", {
         username: username,
         email,
         password: senha,

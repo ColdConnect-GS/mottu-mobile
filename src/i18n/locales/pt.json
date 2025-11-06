@@ -1,0 +1,23 @@
+{
+  "welcomeMottu": "Bem-vindo à Mottu!",
+  "addMoto": "Adicionar Moto",
+  "editMoto": "Editar Moto",
+  "fillAllFields": "Preencha todos os campos.",
+  "invalidPlate": "Placa inválida. Use o formato ABC-1D23.",
+  "invalidYear": "Ano inválido. Digite um ano maior que 1950.",
+  "invalidMileage": "Quilometragem inválida.",
+  "status": "Status",
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+  "model": "Modelo",
+  "plate": "Placa",
+  "platePlaceholder": "Digite a placa (ABC-1D23)",
+  "year": "Ano",
+  "mileage": "Quilometragem",
+  "spot": "Vaga",
+  "notAssigned": "Não atribuída",
+  "error": "Erro",
+  "saveError": "Erro ao salvar a moto.",
+  "changeLanguage": "Mudar idioma",
+  "save": "Salvar"
+}
