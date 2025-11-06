@@ -15,6 +15,7 @@ import { RootStackParamList } from "../../App";
 import { useTheme } from "../theme/ThemeContext";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import i18n from "../i18n/i18n";
 
 import logoMottu from "../../assets/logo_mottu.png";
 import mottu_sport from "../../assets/Mottu_sport.png";
@@ -74,22 +75,22 @@ export default function HomeScreen({ navigation }: Props) {
     const placaRegex = /^[A-Z]{3}-\d[0-9A-Z]\d{2}$/;
 
     if (!modelo || !placa || !ano || !quilometragem || !status) {
-      Alert.alert("Erro", "Preencha todos os campos!");
+      Alert.alert(i18n.t("error"), i18n.t("fillAllFields"));
       return;
     }
 
     if (!placaRegex.test(placa)) {
-      Alert.alert("Erro", "A placa deve seguir o formato ABC-1234 ou ABC-1D23.");
+      Alert.alert(i18n.t("error"), i18n.t("plateFormatError"));
       return;
     }
 
     if (isNaN(Number(ano)) || Number(ano) < 1950) {
-      Alert.alert("Erro", "Informe um ano válido.");
+      Alert.alert(i18n.t("error"), i18n.t("yearError"));
       return;
     }
 
     if (isNaN(Number(quilometragem))) {
-      Alert.alert("Erro", "A quilometragem deve ser um número válido.");
+      Alert.alert(i18n.t("error"), i18n.t("mileageError"));
       return;
     }
 
@@ -101,8 +102,6 @@ export default function HomeScreen({ navigation }: Props) {
       status,
       patioId: 1,
     };
-
-    console.log("Dados enviados:", motoData);
 
     try {
       if (status === "ALUGADA" && editId) {
@@ -123,7 +122,7 @@ export default function HomeScreen({ navigation }: Props) {
       fetchMotos();
     } catch (err) {
       console.log("Erro ao salvar moto:", err);
-      Alert.alert("Erro", "Não foi possível salvar a moto.");
+      Alert.alert(i18n.t("error"), i18n.t("saveError"));
     }
 
     setModalVisible(false);
@@ -150,14 +149,14 @@ export default function HomeScreen({ navigation }: Props) {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Image source={logoMottu} style={styles.logo} resizeMode="contain" />
       <Text style={[styles.title, { color: theme.text }]}>
-        Bem-vindo ao Pátio da Mottu
+        {i18n.t("welcome")}
       </Text>
 
       <TouchableOpacity
         style={[styles.addButton, { backgroundColor: theme.primary }]}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.buttonText}>Adicionar Moto na Vaga</Text>
+        <Text style={styles.buttonText}>{i18n.t("addMoto")}</Text>
       </TouchableOpacity>
 
       <Modal
@@ -169,7 +168,7 @@ export default function HomeScreen({ navigation }: Props) {
         <View style={styles.modalContainer}>
           <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
             <Text style={[styles.modalTitle, { color: theme.text }]}>
-              {editId ? "Editar Moto" : "Adicionar Moto"}
+              {editId ? i18n.t("editMoto") : i18n.t("addMoto")}
             </Text>
 
             {["MOTTU_SPORT", "MOTTU_E", "MOTTU_POP"].map((m) => (
@@ -186,14 +185,14 @@ export default function HomeScreen({ navigation }: Props) {
             ))}
 
             <TextInput
-              placeholder="Placa (ABC-1234)"
+              placeholder={i18n.t("platePlaceholder")}
               placeholderTextColor={theme.secondary}
               style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
               value={placa}
               onChangeText={handlePlacaChange}
             />
             <TextInput
-              placeholder="Ano"
+              placeholder={i18n.t("yearPlaceholder")}
               placeholderTextColor={theme.secondary}
               keyboardType="numeric"
               style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
@@ -201,7 +200,7 @@ export default function HomeScreen({ navigation }: Props) {
               onChangeText={setAno}
             />
             <TextInput
-              placeholder="Quilometragem"
+              placeholder={i18n.t("mileagePlaceholder")}
               placeholderTextColor={theme.secondary}
               keyboardType="numeric"
               style={[styles.input, { borderColor: theme.primary, color: theme.text }]}
@@ -209,7 +208,9 @@ export default function HomeScreen({ navigation }: Props) {
               onChangeText={setQuilometragem}
             />
 
-            <Text style={{ color: theme.text, marginBottom: 5 }}>Status:</Text>
+            <Text style={{ color: theme.text, marginBottom: 5 }}>
+              {i18n.t("status")}:
+            </Text>
             {["DISPONIVEL", "ALUGADA", "MANUTENCAO"].map((s) => (
               <TouchableOpacity
                 key={s}
@@ -219,7 +220,7 @@ export default function HomeScreen({ navigation }: Props) {
                 ]}
                 onPress={() => setStatus(s)}
               >
-                <Text style={{ color: theme.text }}>{s}</Text>
+                <Text style={{ color: theme.text }}>{i18n.t(s)}</Text>
               </TouchableOpacity>
             ))}
 
@@ -228,7 +229,9 @@ export default function HomeScreen({ navigation }: Props) {
                 style={[styles.modalButton, { backgroundColor: theme.primary }]}
                 onPress={adicionarOuEditarMoto}
               >
-                <Text style={styles.buttonText}>{editId ? "Salvar" : "Confirmar"}</Text>
+                <Text style={styles.buttonText}>
+                  {editId ? i18n.t("save") : i18n.t("confirm")}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, { backgroundColor: theme.danger }]}
@@ -237,7 +240,7 @@ export default function HomeScreen({ navigation }: Props) {
                   resetForm();
                 }}
               >
-                <Text style={styles.buttonText}>Cancelar</Text>
+                <Text style={styles.buttonText}>{i18n.t("cancel")}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -255,22 +258,22 @@ export default function HomeScreen({ navigation }: Props) {
             <Image source={getMotoImage(item.modelo)} style={styles.motoImage} />
             <View style={styles.motoInfo}>
               <Text style={[styles.motoText, { color: theme.text }]}>
-                Modelo: {item.modelo}
+                {i18n.t("model")}: {item.modelo}
               </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>
-                Placa: {item.placa}
+                {i18n.t("plate")}: {item.placa}
               </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>
-                Ano: {item.ano}
+                {i18n.t("year")}: {item.ano}
               </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>
-                Quilometragem: {item.quilometragem}
+                {i18n.t("mileage")}: {item.quilometragem}
               </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>
-                Status: {item.status}
+                {i18n.t("status")}: {i18n.t(item.status)}
               </Text>
               <Text style={[styles.motoText, { color: theme.text }]}>
-                Vaga: {item.vagaCodigo || "Não atribuída"}
+                {i18n.t("spot")}: {item.vagaCodigo || i18n.t("notAssigned")}
               </Text>
             </View>
           </TouchableOpacity>
