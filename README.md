@@ -53,24 +53,10 @@ cd mottu-mobile
 \`\`\`
 
 2. Instale as dependências:
-
-\`\`\`bash
 npm install
-\`\`\`
 
 3. Execute o app no Android:
-
-\`\`\`bash
-npx react-native run-android
-\`\`\`
-
-4. Execute o app no iOS:
-
-\`\`\`bash
-npx react-native run-ios
-\`\`\`
-
----
+npm start
 
 ## 📌 Como funciona a funcionalidade de adicionar moto
 
