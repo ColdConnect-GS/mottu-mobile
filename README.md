@@ -46,6 +46,9 @@ mottu-mobile/
 ## ⚙️ Rodar Aplicativo
 
 Link para Rodar o JAVA: https://api-mottu-bhcx.onrender.com
+
+---
+
 Link para Baixar o APP: https://expo.dev/artifacts/eas/raKPaRGPerx78J2TSB3ewM.apk 
 
 ---
