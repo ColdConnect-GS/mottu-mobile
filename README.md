@@ -43,34 +43,26 @@ mottu-mobile/
 
 ---
 
-## ⚙️ Instalação
+## ⚙️ Rodar Aplicativo
 
-1. Clone o repositório:
-
-\`\`\`bash
-git clone https://github.com/LuannZeiro/mottu-mobile.git
-cd mottu-mobile
-\`\`\`
-
-2. Instale as dependências:
-
-\`\`\`bash
-npm install
-\`\`\`
-
-3. Execute o app no Android:
-
-\`\`\`bash
-npx react-native run-android
-\`\`\`
-
-4. Execute o app no iOS:
-
-\`\`\`bash
-npx react-native run-ios
-\`\`\`
+Link para Rodar o JAVA: https://api-mottu-bhcx.onrender.com
 
 ---
+
+Link para Baixar o APP: https://expo.dev/artifacts/eas/raKPaRGPerx78J2TSB3ewM.apk 
+
+---
+
+1. Clone o repositório:
+git clone https://github.com/LuannZeiro/mottu-mobile.git
+cd mottu-mobile
+
+
+2. Instale as dependências:
+npm install
+
+3. Execute o app no Android:
+npm start
 
 ## 📌 Como funciona a funcionalidade de adicionar moto
 
