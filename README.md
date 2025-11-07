@@ -46,11 +46,9 @@ mottu-mobile/
 ## ⚙️ Instalação
 
 1. Clone o repositório:
-
-\`\`\`bash
 git clone https://github.com/LuannZeiro/mottu-mobile.git
 cd mottu-mobile
-\`\`\`
+
 
 2. Instale as dependências:
 npm install
