@@ -12,7 +12,7 @@ import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
 import i18n from "../i18n/i18n"; // ✅ Import do i18n
 
-const BASE_URL = "http://172.20.21.191:8080/api";
+const BASE_URL = "https://api-mottu-bhcx.onrender.com/api";
 
 type Vaga = {
   id: number;

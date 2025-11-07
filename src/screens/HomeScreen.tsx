@@ -38,7 +38,7 @@ export default function HomeScreen({ navigation }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [language, setLanguage] = useState(i18n.locale); // 👈 idioma atual
 
-  const API_URL = "http://172.20.21.191:8080/api/motos";
+  const API_URL = "https://api-mottu-bhcx.onrender.com/api/motos";
 
   const fetchMotos = async () => {
     try {

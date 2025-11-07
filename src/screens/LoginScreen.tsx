@@ -33,7 +33,7 @@ export default function LoginScreen({ navigation }: Props) {
     try {
       console.log("Enviando login:", { email: email, password });
 
-      const response = await axios.post("http://172.20.21.191:8080/api/auth/login", {
+      const response = await axios.post("https://api-mottu-bhcx.onrender.com/api/auth/login", {
         email,
         password,
       });

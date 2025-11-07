@@ -31,11 +31,11 @@ export default function RegisterScreen({ navigation }: Props) {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://172.20.21.191:8080/api/auth/register", {
+      const response = await axios.post("https://api-mottu-bhcx.onrender.com/api/auth/register", {
         username: username,
         email,
         password: senha,
-        role: "ADMIN", // Envia sempre ADMIN
+        role: "ADMIN",
       });
 
       if (response.status === 200 || response.status === 201) {
