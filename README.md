@@ -55,6 +55,8 @@ Link para Baixar o APP: https://expo.dev/artifacts/eas/raKPaRGPerx78J2TSB3ewM.ap
 
 Link para assistir o Video de apresentação: https://youtube.com/shorts/Q5WyPMQesiM?feature=share
 
+---
+
 1. Clone o repositório:
 git clone https://github.com/LuannZeiro/mottu-mobile.git
 cd mottu-mobile
